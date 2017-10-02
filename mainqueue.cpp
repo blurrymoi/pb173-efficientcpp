@@ -14,6 +14,20 @@ int main()
     q.remove();
     assert(q.size() == 1);
 
+    SetQueue<int> s(4);
+    for (auto i : {1,2,1,3,7}){
+        s.insert(i);
+    }
+    int i = s.top();
+    assert(s.size() == 4);
+    assert(i == 7);
+    s.remove();
+    assert(s.size() == 3);
+    assert(s.top() == 3);
+    s.insert(9);
+    s.insert(8);
+    s.insert(7);
+    assert(s.size() == 4);
     
     return 0;
 }
