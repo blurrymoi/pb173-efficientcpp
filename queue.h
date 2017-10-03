@@ -24,8 +24,13 @@ public:
     void insert(T val)
     {
         unsigned pos = 0;
-        while (_items[pos] > val)
-            pos++;
+        if (!empty())
+        {
+            while (pos < size() && _items[pos] > val)
+                pos++;
+            if (pos < _num && _items[pos] == val)
+                return;
+        }
         _items.emplace(_items.begin()+pos, val);
 
         if (_items.size() == _num+1)
