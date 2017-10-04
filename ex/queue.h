@@ -26,6 +26,7 @@ public:
         unsigned pos = 0;
         if (!empty())
         {
+            // std::lower_bound; std::upper_bound -- binary search
             while (pos < size() && _items[pos] > val)
                 pos++;
             if (pos < _num && _items[pos] == val)
