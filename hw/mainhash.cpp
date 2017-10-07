@@ -1,47 +1,56 @@
 #include "hash.hpp"
 #include <iostream>
-#include <string>
-#include <assert.h>
+#include <iomanip>
+
 #include <time.h>
 #include <random>
 #include <climits>
 
+#include <set>
+#include <unordered_set>
+
 using namespace std;
+
+template < typename T >
+void benchmark( std::vector< int >& vec )
+{
+    T t;
+    clock_t beg = clock();
+
+    for (auto el : vec)
+        t.insert(el);
+
+    for (auto el : vec)
+        auto ret = t.find(el);
+
+    clock_t end = clock();
+    cout << end - beg << endl;
+}
 
 int main()
 {
-    HashLinked<int, int> h;
 
-    h.insert(6);
-    //h.printhashy();
+    std::default_random_engine gen{ static_cast< unsigned long >( time(NULL) ) };
+    std::uniform_int_distribution<> distr( INT_MIN, INT_MAX );
 
-    h.insert(4);
-    //h.printhashy();
+    std::vector< int > vec;
+    for( unsigned i = 0; i < 10000000; ++i ) {  
+        vec.push_back( distr(gen) );
+    }
 
-    h.insert(-2);
-    h.insert(22);
+    cout << "*10^7, measured in clock() things with -O2*" << endl;
+
+    cout << setw(8) << "set: ";
+    benchmark< std::set<int> >(vec);
+
+    cout << setw(8) << "u_set: ";
+    benchmark< std::unordered_set<int> >(vec);
     
-    assert(h.num_items == 4);
-    h.insert(4);
-    assert(h.num_items == 4);
-    //h.printhashy();
+    cout << setw(8) << "LL: ";
+    benchmark< HashLinked<int,int> >(vec);
 
-    assert( h.find(6)->item == 6 );
-    assert( h.find(5) == nullptr );
- 
-    std::default_random_engine gen{static_cast<unsigned long>(time(NULL))};
-    std::uniform_int_distribution<> distr(INT_MIN, INT_MAX);
-
-    HashLinked<int,int> hl;
-    clock_t vecq_beg = clock();    
-
-    for( unsigned i = 0; i < 10000000; ++i )
-        hl.insert( distr(gen) );
-    //while(!qu.empty())
-    //    qu.remove();
-
-    clock_t vecq_end = clock();
-    cout << "LL: " << vecq_end - vecq_beg << endl;
+    cout << setw(8) << "prob: ";
+    benchmark< HashProbing<int,int> >(vec);    
 
     return 0;
 }
