@@ -5,6 +5,7 @@
 #include <time.h>
 #include <random>
 #include <climits>
+#include <cstdlib>
 
 #include <set>
 #include <unordered_set>
@@ -29,13 +30,11 @@ void benchmark( std::vector< int >& vec )
 
 int main()
 {
-
-    std::default_random_engine gen{ static_cast< unsigned long >( time(NULL) ) };
-    std::uniform_int_distribution<> distr( INT_MIN, INT_MAX );
+    std::srand( std::time(0) );
 
     std::vector< int > vec;
     for( unsigned i = 0; i < 10000000; ++i ) {  
-        vec.push_back( distr(gen) );
+        vec.push_back( std::rand() );
     }
 
     cout << "*10^7, measured in clock() things with -O2*" << endl;
