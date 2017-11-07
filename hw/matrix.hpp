@@ -52,6 +52,7 @@ public:
             throw std::invalid_argument("wrong size");
         Matrix< rows, c > ret(false);        
 
+    /*
     for(size_t mid = 0; mid < rows; ++mid) {
         for(size_t i = 0; i < cols; ++i)
             for(size_t j = 0; j < c; ++j) {
@@ -63,7 +64,12 @@ public:
                     ret._data[mid][j] += _data[mid][i] * m._data[i][j];//sum += _data[i][mid]*m._data[mid][j];
                 }
                 //ret._data[i][j] = sum;
-            }
+            }*/
+
+             for(size_t i = 0; i < cols; ++i)
+              for(size_t mid = 0; mid < rows; ++mid)
+                for(size_t j = 0; j < c; ++j)
+                    ret._data[mid][j] += _data[mid][i] * m._data[i][j];
         
         return ret;
     }

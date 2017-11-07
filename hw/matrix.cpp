@@ -93,23 +93,3 @@ struct Matr : benchmark::Group
     }
 };
 
-int test()
-{
-    Matrix<3,2> m;
-    auto n = m;
-    auto p(n);
-    Matrix<2,4> mm;
-    
-    cout << m;    
-    cout << n;
-    cout << p;
-    cout << mm;
-    cout << m*mm;
-
-    Matrix<1,1> m1, m2;
-    Matrix<1,1> m3 = m1*m2;
-
-    return 0;
-}
-
-
