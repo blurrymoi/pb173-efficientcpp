@@ -28,9 +28,11 @@ int main()
     Matrix<500,500> m12_1, m12_2;
     auto result1 = m12_1*m12_2;
     auto result2 = m12_1.mult_(m12_2);
-    auto result3 = m12_1.mult_tile(m12_2);    
+    auto result3 = m12_1.mult_tile(m12_2);
+    auto result4 = mult_parallel(m12_1, m12_2);
     assert(( result1._data == result2._data ));
     assert(( result1._data == result3._data ));
+    assert(( result1._data == result4._data ));
 
     return 0;
 }
