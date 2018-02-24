@@ -37,6 +37,32 @@ public:
         insert( std::move( h ) );
     }
 
+    void erase( T item )
+    {
+        Item h = Item( item );
+        Item *current;
+        if ( items[h.hash % size] )
+        {
+            current = items[h.hash % size].get();
+            if ( current->hash == h.hash ) {
+                items[ h.hash % size ] = std::move( current->next );
+                num_items--;
+            }
+            else
+                while( current->next )
+                {
+                    if ( current->next->hash == h.hash ) {
+                        current->next = std::move( current->next->next );
+                        num_items--;
+                    }
+                    else
+                        current = (current->next).get();
+                }
+        }
+        if ( (double(num_items)/size) < (1.0/10) )
+            rehash();
+    }
+
     Item* find ( T item )
     {
         Item h = Item( item );
@@ -113,6 +139,7 @@ private:
     }
 };
 
+enum State { Exists, NotExists, Tombstone };
 
 template < typename Key, typename Value >
 class HashProbing {
