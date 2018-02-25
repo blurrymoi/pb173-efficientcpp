@@ -77,21 +77,38 @@ struct Hashy : benchmark::Group
         }
     }
 
+    BENCHMARK( erase )
+    {
+        switch ( q )
+        {
+            case 1: er< std::set<int> >(p); break;
+            case 2: er< std::unordered_set<int> >(p); break;
+            case 3: er< HashLinked<int,int> >(p); break;
+            case 4: er< HashProbing<int,int> >(p); break;
+        }
+    }
+
     template < typename T >
-    void run( /*std::vector< int >& vec*/ )
+    void run()
     {
         T t;
 
         for (auto el : vec)
             t.insert(el);
+    }
 
-        /*    
-        for (auto el : vec)
-            auto ret = t.find(el);
+    template < typename T >
+    void er( unsigned p )
+    {
+        T t;
+        int to_erase = vec[0];
 
-        for (auto el : vec) {
-            t.erase(el);
+        for (unsigned i = 0; i < p; ++i) {
+            t.insert(vec[i]);
+            if(i % 3 == 0) {
+                t.erase(to_erase);
+                to_erase = vec[i];
+            }
         }
-        */
     }
 };
