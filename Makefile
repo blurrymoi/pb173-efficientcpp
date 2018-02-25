@@ -9,7 +9,7 @@ hw1: ./hw/mainhash.cpp
 	$(CXX) $(CXXFLAGS) -o hw1 ./hw/mainhash.cpp
 
 hw2: ./hw/hash.hpp ./hw/hw2.cpp
-	$(CXX) $(CXXFLAGS) -o hw2 ./hw/hw2.cpp
+	$(CXX) $(CXXFLAGS) -Ibricks -o hw2 ./hw/hw2.cpp
 
 hw3: ./hw/matrix.cpp ./hw/matrix.hpp
 	$(CXX) $(CXXFLAGS) -Ibricks -o hw3 ./hw/matrix.cpp
