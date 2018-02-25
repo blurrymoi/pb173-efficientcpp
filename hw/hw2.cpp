@@ -24,9 +24,9 @@ void benchmark( std::vector< int >& vec )
     for (auto el : vec)
         auto ret = t.find(el);
 
-    for (auto el : vec)
+    for (auto el : vec) {
         t.erase(el);
-    //if(t.size);
+    }
 
     clock_t end = clock();
     cout << end - beg << endl;
@@ -52,8 +52,8 @@ int main()
     cout << setw(8) << "LL: ";
     benchmark< HashLinked<int,int> >(vec);
 
-    //cout << setw(8) << "prob: ";
-    //benchmark< HashProbing<int,int> >(vec);    
+    cout << setw(8) << "prob: ";
+    benchmark< HashProbing<int,int> >(vec);    
 
     return 0;
 }

@@ -3,6 +3,8 @@
 #include <memory> //unique_ptr
 #include <stack>
 
+#include <iostream>
+
 using namespace std;
 
 template < typename Key, typename T >
@@ -59,8 +61,8 @@ public:
                         current = (current->next).get();
                 }
         }
-        if ( (double(num_items)/size) < (1.0/10) )
-            rehash();
+        //if ( (double(num_items)/size) < (1.0/10) )
+        //    rehash();
     }
 
     Item* find ( T item )
@@ -137,6 +139,27 @@ private:
             } while (1);         
         }
     }
+public:
+    void print()
+    {
+        std::cout << "size: " << size << std::endl;
+        std::cout << "num_items: " << num_items << std::endl;
+
+        for( size_t i = 0; i < size; ++i ) {
+            std::cout << "i -- " << i << std::endl;
+            
+            Item *current;
+            if( items[i] ) {
+                current = items[i].get();
+                
+                while( current ) {
+                    std::cout << current->item << " : " << current->hash << std::endl;                
+                    current = (current->next).get();
+                }
+            }
+        }
+
+    }
 };
 
 enum State { Exists, NotExists, Tombstone };
@@ -145,14 +168,14 @@ template < typename Key, typename Value >
 class HashProbing {
 
     struct ItemPair {
-        bool exists;
+        State state;
         Value val;
         decltype( std::hash< Key >{}( Value() ) ) hash;
 
-        ItemPair() : exists( false ) {}
+        ItemPair() : state( NotExists ) {}
 
         ItemPair( Value v )
-            : exists( true ), 
+            : state( Exists ), 
               val( v ), 
               hash( std::hash< Key >{}( v ) ) {}
 
@@ -160,9 +183,11 @@ class HashProbing {
         ItemPair& operator=( ItemPair& ) = default;
         ItemPair& operator=( ItemPair&& ) = default;
 
+        /*
         operator bool() {
-            return exists;        
+            return state == Exists;        
         }
+        */
     };
 
 public:
@@ -171,6 +196,7 @@ public:
     std::vector< Item > items;
     size_t size = 512;
     size_t num_items = 0;
+    size_t num_graves = 0;
 
     HashProbing() {
         items.resize( size );
@@ -185,7 +211,7 @@ public:
     {
         unsigned index = item.hash % size;
         do {
-            if ( !(items[index]) ) {
+            if ( items[index].state == NotExists ) {
                 items[index] = item;
                 break;
             }
@@ -195,7 +221,7 @@ public:
 
         num_items++;
 
-        if ( (double(num_items)/size) > (2.0/3) )
+        if ( ((double(num_items) + num_graves)/size) > (2.0/3) )
             rehash();
     }
 
@@ -204,14 +230,14 @@ public:
         auto hash = std::hash< Key >{}( item );
         size_t index = hash % size;
         do {
-            if ( items[index] ) {
-                if ( items[index].val == item )
+            if ( items[index].state == NotExists )
+                return Item();
+            else {
+                if ( items[index].state == Exists && items[index].val == item )
                     return items[index];
                 else
                     index = (index + 1) % size;
             }
-            else
-                return Item();
         } while(1);
     }
 
@@ -220,20 +246,45 @@ public:
         std::stack< Item > to_rehash;
 
         for( size_t i = 0; i < size; ++i ) {
-            if( items[i] ) {
+            State state = items[i].state;
+            if( state == NotExists )
+                continue;
+            if( state == Exists )
                 to_rehash.push( items[i] );
-                items[i].exists = false;
-            }
+            items[i].state = NotExists;
         }
 
         size *= 2;
         items.resize( size );
-        num_items = 0;
+        num_items = num_graves = 0;
 
         while ( !to_rehash.empty() ) {
             Item item = to_rehash.top(); 
             to_rehash.pop();
             insert( item );
         }   
+    }
+
+    void erase( Value item )
+    {
+        auto hash = std::hash< Key >{}( item );
+        size_t index = hash % size;
+        do {
+            if ( items[index].state == NotExists )
+                return;
+            else {
+                if ( items[index].state == Exists && items[index].val == item ) {
+                    items[index].state = Tombstone;
+                    num_graves++;
+                }
+                else
+                    index = (index + 1) % size;
+            }
+        } while(1);
+
+        if ( ((double(num_items) + num_graves)/size) > (2.0/3) )
+            rehash();
+        
+        return;
     }
 };
