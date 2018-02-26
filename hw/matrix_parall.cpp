@@ -6,7 +6,7 @@
 #include <cassert>
 #include <type_traits>
 
-// ./hw3 category:matrix | gnuplot > matrix.pdf
+// ./hw5 category:matrix | gnuplot > hw5.pdf
 // may want to increase ULIMIT
 
 using namespace brick;

@@ -7,9 +7,9 @@ using namespace std;
 
 int main()
 {
-    auto res = std::array<std::array<double,4>,3>({std::array<double,4>({2074,2857,2717,2633}),{1770,2413,2263,2173},{2298,3145,2965,2857}});
+    std::array<std::array<double,4>,3> res {std::array<double,4>({2074,2857,2717,2633}),{1770,2413,2263,2173},{2298,3145,2965,2857}};
 
-    //Matrix<500,500> m12_1, m12_2;
+    //Matrix<100,100> m12_1, m12_2;
     //auto result4 = mult_parallel(m12_1, m12_2);
 
     
@@ -37,10 +37,10 @@ int main()
     auto result2 = m12_1.mult_(m12_2);
     auto result3 = m12_1.mult_tile(m12_2);
     auto result4 = mult_parallel(m12_1, m12_2);
-    /*assert(( result1._data == result2._data ));
+    
+    assert(( result1._data == result2._data ));
     assert(( result1._data == result3._data ));
-    //assert(( result1._data == result4._data ));
-    */
+    assert(( result1._data == result4._data ));
 
     return 0;
 }

@@ -6,9 +6,10 @@
 #include <vector>
 #include <queue>
 #include <functional>
+#include <atomic>
 
 
-bool ended = false;
+std::atomic< bool > ended { false };
 
 template< size_t rows, size_t r, size_t c >
 using ComputeFuncT = void( const std::array< double, r >&, const Matrix< r, c >&, std::array< double, rows >& );
@@ -26,20 +27,20 @@ void job_fn( const std::array< double, r >& data, const Matrix< r, c >& m2, std:
 
 
 template< size_t rows, size_t r, size_t c >
-void loop_fn( std::mutex& mutex, std::queue< std::function< void() > > jobs ) {
+void loop_fn( std::mutex& mutex, std::queue< std::function< void() > > &jobs ) {
     while(true)
     {
         if(ended) return;
 
         if (mutex.try_lock()) {
-            std::cout << "TRYLOCKED" << std::endl;
+            //std::cout << "TRYLOCKED" << std::endl;
             if (!jobs.empty())
-            {   std::cout << "*unempty, size " << jobs.size() << std::endl;
-                //if (jobs.size() == 1) { std::cout << "*ENDED*" <<std::endl; ended = true; }            
+            {   //std::cout << "*unempty, size " << jobs.size() << std::endl;
+                if (jobs.size() == 1) { /*std::cout << "*ENDED*" <<std::endl;*/ ended = true; }  /* fishy */           
                 auto job = jobs.front();
                 jobs.pop();
                 mutex.unlock();
-                std::cout << "**unlocked, performing job" << std::endl;
+                //std::cout << "**unlocked, performing job" << std::endl;
                 job();
             } else { mutex.unlock(); return; }
         }
@@ -62,7 +63,7 @@ Matrix< rows, c > mult_parallel( const Matrix< rows, r > &m1, const Matrix< r, c
 
     for(size_t i = 0; i < rows; ++i) {
             _jobs.push( std::bind( job_fn< rows, r, c >, std::cref(m1._data[i]), std::cref(m2), std::ref(ret._data[i]) ) );
-            cout << "pushed back job i: " << i << endl;
+            //cout << "pushed back job i: " << i << endl;
 	    
         /*double sum = 0;
 	    for(size_t mid = 0; mid < r; ++mid){
@@ -73,11 +74,12 @@ Matrix< rows, c > mult_parallel( const Matrix< rows, r > &m1, const Matrix< r, c
     
     for(size_t i = 0; i < num_threads; ++i) {
         _threads.push_back( std::thread( loop_fn< rows, r, c >, std::ref( _mutex ), std::ref( _jobs ) ));
-        cout << "thread " << i << " created" << endl;
+        //cout << "thread " << i << " created" << endl;
     }
 
-    cout << "HERE" << endl;
+    //cout << "HERE" << endl;
 
+    /*
     while(true)
     {   
         _mutex.lock();
@@ -91,6 +93,7 @@ Matrix< rows, c > mult_parallel( const Matrix< rows, r > &m1, const Matrix< r, c
 
         if (ended) break;
     }
+    */
     for(auto& thr : _threads)
         thr.join();
     return ret;
