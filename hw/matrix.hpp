@@ -81,9 +81,11 @@ public:
     friend std::ostream& operator<< (std::ostream& o, const Matrix< r,c >& m);
 };
 
+/* dummy unsigned params, for parallel */
+
 template< int p >
 struct m {
-static double run() {
+static double run(unsigned i = 0) {
     Matrix< p,p > m1(false), m2(false);
     return (m1 * m2)._data[0][0];
 }
@@ -91,7 +93,7 @@ static double run() {
 
 template< int p >
 struct m_c {
-static double run() {
+static double run(unsigned i = 0) {
     Matrix< p,p > m1(false), m2(false);
     return m1.mult_(m2)._data[0][0];
 }
@@ -99,7 +101,7 @@ static double run() {
 
 template< int p >
 struct m_t {
-static double run() {
+static double run(unsigned i = 0) {
     Matrix< p,p > m1(false), m2(false);
     return m1.mult_tile(m2)._data[0][0];
 }

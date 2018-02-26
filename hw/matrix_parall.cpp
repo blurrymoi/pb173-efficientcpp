@@ -29,7 +29,7 @@ struct Matr : benchmark::Group
         y.name = "type";
         
         y.min = 1;
-        y.max = 4;
+        y.max = 5;
         y._render = []( int i )
         {
             switch ( i )
@@ -37,7 +37,8 @@ struct Matr : benchmark::Group
                 case 1: return "naive";
                 case 2: return "\"cache-efficient\"";
                 case 3: return "tiling";
-                case 4: return "parallel";
+                case 4: return "parallel-2";
+                case 5: return "parallel-4";
             }
         };
     }
@@ -52,15 +53,20 @@ struct Matr : benchmark::Group
         {
             case 1: run< m >( p, ONE ); break;
             case 2: run< m_c >( p, ONE ); break;
-            case 3: run < m_t >( p, ONE ); break;
-            case 4: run < m_p >( p, ONE ); break;
+            case 3: run< m_t >( p, ONE ); break;
+            case 4: run< m_p >( p, ONE ); break;
+            case 5: run< m_p >( p, ONE ); break;
         }
     }
 
     template< template< int > class bench, int i >
     void run( int p, std::integral_constant< int, i > ) {
-        if ( i == p )
-            bench< i >::run();
+        if ( i == p ) {
+            if ( q == 5 )
+                bench< i >::run(4);
+            else
+                bench< i >::run(2);
+        }
         else
             run< bench >( p, std::integral_constant< int, i*2 >() );
     }
